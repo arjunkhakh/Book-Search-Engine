@@ -1,14 +1,3 @@
-// type Query {
-//     me: User
-//   }
-
-//   type Mutation {
-//     login(email: String!, password: String!): Auth
-//     addUser(username: String!, email: String!, password: String!): Auth
-//     saveBook(): User // Look into this one
-//     removeBook(bookId: ID!): User
-//     }
-
 const { User } = require('../models')
 
 const resolvers = {
@@ -23,20 +12,26 @@ Mutation: {
         const user = await User.findOne({ 
         $or: [{ email, password }] });
 
-        // const token = signToken(user);
-        // return res.json({ token, user });
+        const token = signToken(user);
+        return ({ token, user });
     },
 
     addUser: async (parent, { username, email, password }) => {
-        return User.create({ username, email, password });
+        const user = User.create({ username, email, password });
+
+        const token = signToken(user);
+
+        return { token, user };
     },
 
     saveBook: async () => {
-        
+        return await User.findByIdAndUpdate({ _id: context.user._id }, 
+            { $addToSet: { savedBooks: args.input } }, 
+            { new: true, runValidators: true });
     },
 
     removeBook: async (parent, { bookId }) => {
-        return User.savedBook.findOneAndDelete({ _id }),
+        return await User.savedBook.findOneAndDelete({ _id }),
         { $pull: { savedBooks: { bookId } } },
         { new: true };
     },
