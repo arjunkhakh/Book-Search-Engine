@@ -23,11 +23,7 @@ const server = new ApolloServer({
   context: authMiddleware,
 });
 
-app.use(routes);
-
-// db.once('open', () => {
-//   app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
-// });
+// app.use(routes);
 
 // Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async (typeDefs, resolvers) => {
