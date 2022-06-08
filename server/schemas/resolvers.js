@@ -36,16 +36,26 @@ Mutation: {
         return { token, user };
     },
 
-    saveBook: async () => {
-        return await User.findByIdAndUpdate({ _id: context.user._id }, 
-            { $addToSet: { savedBooks: args.input } }, 
-            { new: true, runValidators: true });
+    saveBook: async (parent, {bookInfo}, context) => {
+        if(context.user){
+            const userBook = await User.findByIdAndUpdate({ _id: context.user._id }, 
+                { $addToSet: { savedBooks: bookInfo } }, 
+                { new: true, runValidators: true });
+                return userBook
+        }
+
+        throw new AuthenticationError('You Must Be Logged In!');
     },
 
-    removeBook: async (parent, { bookId }) => {
-        return await User.savedBook.findOneAndDelete({ _id }),
+    removeBook: async (parent, { bookId }, context) => {
+
+        if(context.user){
+        const deleteBook = await User.savedBook.findOneAndDelete({ _id: context.user._id },
         { $pull: { savedBooks: { bookId } } },
-        { new: true };
+        { new: true });
+        return deleteBook;
+        }
+        throw new AuthenticationError('You Must Be Logged In!');
     },
 },
 }
