@@ -8,7 +8,7 @@ import Navbar from './components/Navbar';
 import { setContext } from '@apollo/client/link/context';
 
 // This will be used to create our endpoint for GraphQL
-const endpointGraphQl = createHttpLink({
+const httpLink = createHttpLink({
   uri: '/graphql',
 });
 
@@ -26,7 +26,7 @@ const authLink = setContext((_, { headers }) => {
 
 // Set up our client to execute the `authLink` middleware prior to making the request to our GraphQL API
 const client = new ApolloClient({
-  link: authLink.concat(endpointGraphQl),
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 
