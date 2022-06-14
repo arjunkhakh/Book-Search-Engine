@@ -45,7 +45,7 @@ Mutation: {
     saveBook: async (parent, {bookInfo}, context) => {
         if(context.user){
             console.log(context.user._id)
-            const userBook = await User.findByIdAndUpdate(
+            const userBook = await User.findOneAndUpdate(
                 { _id: context.user._id }, 
                 { $addToSet: { savedBooks: bookInfo } }, 
                 { new: true, runValidators: true });
