@@ -5,8 +5,14 @@ const { User } = require('../models')
 
 const resolvers = {
 Query: {
-    me: async () => {
-        return User.find({});
+    me: async (parent, args, context) => {
+        if(context.user){
+            
+            const userData = await User.findOne({_id:context.user._id}).select('-__v -password')
+           
+            return userData;
+        }
+        throw new AuthenticationError('You Are Not Logged In!');
     },
 },
 
@@ -38,7 +44,9 @@ Mutation: {
 
     saveBook: async (parent, {bookInfo}, context) => {
         if(context.user){
-            const userBook = await User.findByIdAndUpdate({ _id: context.user._id }, 
+            console.log(context.user._id)
+            const userBook = await User.findByIdAndUpdate(
+                { _id: context.user._id }, 
                 { $addToSet: { savedBooks: bookInfo } }, 
                 { new: true, runValidators: true });
                 return userBook
@@ -50,7 +58,7 @@ Mutation: {
     removeBook: async (parent, { bookId }, context) => {
 
         if(context.user){
-        const deleteBook = await User.savedBook.findOneAndDelete({ _id: context.user._id },
+        const deleteBook = await User.findOneAndUpdate({ _id: context.user._id },
         { $pull: { savedBooks: { bookId } } },
         { new: true });
         return deleteBook;
